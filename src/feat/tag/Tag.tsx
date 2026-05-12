@@ -1,18 +1,19 @@
-import type { FC } from "react";
-import { fx, getModule, type ShapeProps } from "../shape";
-import type { Logo, StyleSetting } from "./state";
-import { type QrMatrix, truncateMiddle } from "./util";
+import { useAtomValue } from "jotai";
+import { type FC, useMemo } from "react";
+import { fx, getModule } from "../shape";
+import { shapeAtom } from "../shape/state";
+import { logoAtom, styleAtom } from "./state";
+import { qrModuleRects, truncateMiddle } from "./util";
 
-export const Tag: FC<{
-  shape: ShapeProps;
-  url: string;
-  matrix: QrMatrix;
-  laser: StyleSetting;
-  stroke: number;
-  logo: Logo;
-}> = ({ shape, url, matrix, laser, stroke, logo }) => {
+export const Tag: FC<{ url: string; stroke: number }> = ({ url, stroke }) => {
+  const shape = useAtomValue(shapeAtom);
+  const laser = useAtomValue(styleAtom);
+  const logo = useAtomValue(logoAtom);
+
+  const matrix = useMemo(() => qrModuleRects(url), [url]);
+
   const mod = getModule(shape.shape);
-  const box = mod.qrBox(shape);
+  const box = mod.qrbox(shape);
   const cellSize = box.size / matrix.size;
   const labelMaxChars = Math.max(10, Math.floor(mod.size(shape)[0] / 0.7));
 
@@ -22,7 +23,7 @@ export const Tag: FC<{
         {truncateMiddle(url, labelMaxChars)}
       </text>
 
-      <mod.Outline shape={shape} color={laser.cuttingColor} stroke={stroke} />
+      <mod.outline stroke={stroke} />
 
       <g fill={laser.patternColor} stroke="none" transform={`translate(${fx(box.x)} ${fx(box.y)})`}>
         {matrix.cells.map(({ x, y }) => (

@@ -1,23 +1,21 @@
+import { useAtomValue } from "jotai";
 import { Children, type FC, type ReactNode } from "react";
-import { fx, type ShapeProps, size } from "../shape";
+import { urlsAtom } from "../content";
+import { fx, size } from "../shape";
+import { shapeAtom } from "../shape/state";
 import { Tag } from "../tag";
-import type { Logo, StyleSetting } from "../tag/state";
-import type { QrMatrix } from "../tag/util";
-import type { Layout } from ".";
-import { SCREEN_STROKE } from "./util";
+import { styleAtom } from "../tag/state";
+import { type Layout, layoutAtom } from ".";
 
-export const Sheet: FC<{
-  shape: ShapeProps;
-  layout: Layout;
-  laser: StyleSetting;
-  logo: Logo;
-  urls: string[];
-  matrices: QrMatrix[];
-  onScreen?: boolean;
-}> = ({ shape, layout, laser, logo, urls, matrices, onScreen }) => {
+export const Sheet: FC = () => {
+  const urls = useAtomValue(urlsAtom);
+  const shape = useAtomValue(shapeAtom);
+  const layout = useAtomValue(layoutAtom);
+  const laser = useAtomValue(styleAtom);
+
   const [width, height] = size(shape);
   const { pageW, pageH } = computeGrid(layout, width, height, urls.length);
-  const stroke = onScreen ? SCREEN_STROKE : laser.stroke;
+  const stroke = laser.stroke;
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -26,29 +24,19 @@ export const Sheet: FC<{
       viewBox={`0 0 ${fx(pageW)} ${fx(pageH)}`}
     >
       <title>QR tag sheet</title>
-      <Layouter layout={layout} cellWidth={width} cellHeight={height}>
-        {urls.map((url, i) => (
-          <Tag
-            key={url}
-            shape={shape}
-            url={url}
-            matrix={matrices[i]}
-            laser={laser}
-            stroke={stroke}
-            logo={logo}
-          />
+      <Layouter>
+        {urls.map((url) => (
+          <Tag key={url} url={url} stroke={stroke} />
         ))}
       </Layouter>
     </svg>
   );
 };
 
-export const Layouter: FC<{
-  layout: Layout;
-  cellWidth: number;
-  cellHeight: number;
-  children: ReactNode;
-}> = ({ layout, cellWidth, cellHeight, children }) => {
+export const Layouter: FC<{ children: ReactNode }> = ({ children }) => {
+  const shape = useAtomValue(shapeAtom);
+  const layout = useAtomValue(layoutAtom);
+  const [cellWidth, cellHeight] = size(shape);
   const cellW = cellWidth + layout.gap;
   const cellH = cellHeight + layout.gap;
   return (

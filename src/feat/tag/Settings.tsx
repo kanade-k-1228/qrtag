@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/select";
 import { Field, Section } from "../form";
 import { getModule, SHAPE_DEFAULTS, SHAPE_OPTIONS } from "../shape";
-import { shapeAtom } from "./state";
+import { shapeAtom } from "../shape/state";
 
 export const ShapeSettings: FC = () => {
   const [shape, setShape] = useAtom(shapeAtom);
@@ -37,10 +37,7 @@ export const ShapeSettings: FC = () => {
         </Field>
       </Section>
 
-      <mod.Fields
-        shape={shape}
-        onChange={(patch) => setShape({ ...shape, ...patch } as typeof shape)}
-      />
+      <mod.config />
     </>
   );
 };

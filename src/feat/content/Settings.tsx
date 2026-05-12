@@ -10,21 +10,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Field, Section } from "../form";
-import { itemAtom } from ".";
+import { contentAtom } from ".";
 
-export const ItemSettings: FC = () => {
-  const [item, setItem] = useAtom(itemAtom);
+export const ContentSettings: FC = () => {
+  const [content, setContent] = useAtom(contentAtom);
 
   return (
     <Section title="Tag content">
       <Field label="Mode">
         <Select
-          value={item.item}
+          value={content.content}
           onValueChange={(mode) =>
-            setItem(
+            setContent(
               mode === "list"
-                ? { item: "list", bodys: [] }
-                : { item: "uuid", base: "", idlen: 32, count: 12 },
+                ? { content: "list", bodys: [] }
+                : { content: "uuid", base: "", idlen: 32, count: 12 },
             )
           }
         >
@@ -38,23 +38,24 @@ export const ItemSettings: FC = () => {
         </Select>
       </Field>
 
-      {item.item === "uuid" ? (
+      {content.content === "uuid" ? (
         <>
           <Field label="Base URL">
             <Input
               type="text"
-              value={item.base}
-              onChange={(e) => setItem({ ...item, base: e.target.value })}
+              value={content.base}
+              onChange={(e) => setContent({ ...content, base: e.target.value })}
               className="h-9"
             />
           </Field>
           <Field label="ID length (nanoid)">
             <Input
               type="number"
-              value={item.idlen}
+              value={content.idlen}
               onChange={(e) => {
                 const n = Number(e.target.value);
-                if (Number.isFinite(n)) setItem({ ...item, idlen: Math.max(1, Math.round(n)) });
+                if (Number.isFinite(n))
+                  setContent({ ...content, idlen: Math.max(1, Math.round(n)) });
               }}
               min={1}
               step={1}
@@ -64,10 +65,11 @@ export const ItemSettings: FC = () => {
           <Field label="Count">
             <Input
               type="number"
-              value={item.count}
+              value={content.count}
               onChange={(e) => {
                 const n = Number(e.target.value);
-                if (Number.isFinite(n)) setItem({ ...item, count: Math.max(1, Math.round(n)) });
+                if (Number.isFinite(n))
+                  setContent({ ...content, count: Math.max(1, Math.round(n)) });
               }}
               min={1}
               step={1}
@@ -77,10 +79,10 @@ export const ItemSettings: FC = () => {
         </>
       ) : (
         <UrlListTextArea
-          value={item.bodys.join("\n")}
+          value={content.bodys.join("\n")}
           onChange={(text) =>
-            setItem({
-              ...item,
+            setContent({
+              ...content,
               bodys: text
                 .split(/\r?\n/)
                 .map((s) => s.trim())

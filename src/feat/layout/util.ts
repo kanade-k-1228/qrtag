@@ -1,8 +1,6 @@
 import { type ReactElement, useCallback } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
-export const SCREEN_STROKE = 0.3;
-
 export const useDownload = (filename: string, render: () => ReactElement) =>
   useCallback(() => {
     const svg = renderToStaticMarkup(render());

@@ -12,9 +12,9 @@ export interface ShapeModule<P extends ShapeProps> {
   label: string;
   default: P;
   size: (s: P) => [number, number];
-  qrBox: (s: P) => { x: number; y: number; size: number };
-  Outline: FC<{ shape: P; color: string; stroke: number }>;
-  Fields: FC<{ shape: P; onChange: (patch: Partial<P>) => void }>;
+  qrbox: (s: P) => { x: number; y: number; size: number };
+  outline: FC<{ stroke: number }>;
+  config: FC;
 }
 
 type AnyModule = ShapeModule<ShapeProps>;
@@ -36,4 +36,4 @@ export const SHAPE_DEFAULTS: { [K in ShapeKind]: Extract<ShapeProps, { shape: K 
 };
 
 export const size = (s: ShapeProps) => getModule(s.shape).size(s);
-export const qrBox = (s: ShapeProps) => getModule(s.shape).qrBox(s);
+export const qrBox = (s: ShapeProps) => getModule(s.shape).qrbox(s);

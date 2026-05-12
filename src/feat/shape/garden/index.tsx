@@ -1,5 +1,8 @@
+import { useAtom, useAtomValue } from "jotai";
 import { Field, NumberInput, Section } from "../../form";
+import { styleAtom } from "../../tag/state";
 import { fx, type ShapeModule } from "..";
+import { shapeAtom } from "../state";
 
 export interface GardenProps {
   shape: "garden";
@@ -26,79 +29,86 @@ export const gardenModule: ShapeModule<GardenProps> = {
     stemHeight: 30,
   },
   size: (s) => [s.width, s.height + s.stemHeight],
-  qrBox: (s) => ({ x: (s.width - s.size) / 2, y: (s.height - s.size) / 2, size: s.size }),
-  Outline: ({ shape, color, stroke }) => {
+  qrbox: (s) => ({ x: (s.width - s.size) / 2, y: (s.height - s.size) / 2, size: s.size }),
+  outline: ({ stroke }) => {
+    const shape = useAtomValue(shapeAtom) as GardenProps;
+    const laser = useAtomValue(styleAtom);
     const { width, height, corner, stemTop, stemBottom, stemHeight } = shape;
     return (
-      <g fill="none" stroke={color} strokeWidth={fx(stroke)}>
+      <g fill="none" stroke={laser.cuttingColor} strokeWidth={fx(stroke)}>
         <path d={outlinePath(width, height, corner, stemTop, stemBottom, stemHeight)} />
       </g>
     );
   },
-  Fields: ({ shape, onChange }) => (
-    <>
-      <Section title="Head dimensions [mm]">
-        <Field label="Width">
-          <NumberInput
-            value={shape.width}
-            onChange={(n) => onChange({ width: n })}
-            step={0.5}
-            min={5}
-          />
-        </Field>
-        <Field label="Height">
-          <NumberInput
-            value={shape.height}
-            onChange={(n) => onChange({ height: n })}
-            step={0.5}
-            min={5}
-          />
-        </Field>
-        <Field label="QR size">
-          <NumberInput
-            value={shape.size}
-            onChange={(n) => onChange({ size: n })}
-            step={0.5}
-            min={5}
-          />
-        </Field>
-        <Field label="Corner radius">
-          <NumberInput
-            value={shape.corner}
-            onChange={(n) => onChange({ corner: n })}
-            step={0.1}
-            min={0}
-          />
-        </Field>
-      </Section>
-      <Section title="Trapezoidal stem [mm]">
-        <Field label="Top width">
-          <NumberInput
-            value={shape.stemTop}
-            onChange={(n) => onChange({ stemTop: n })}
-            step={0.5}
-            min={1}
-          />
-        </Field>
-        <Field label="Bottom width">
-          <NumberInput
-            value={shape.stemBottom}
-            onChange={(n) => onChange({ stemBottom: n })}
-            step={0.5}
-            min={1}
-          />
-        </Field>
-        <Field label="Height">
-          <NumberInput
-            value={shape.stemHeight}
-            onChange={(n) => onChange({ stemHeight: n })}
-            step={0.5}
-            min={1}
-          />
-        </Field>
-      </Section>
-    </>
-  ),
+  config: () => {
+    const [shape, setShape] = useAtom(shapeAtom);
+    const s = shape as GardenProps;
+    const onChange = (patch: Partial<GardenProps>) => setShape({ ...s, ...patch });
+    return (
+      <>
+        <Section title="Head dimensions [mm]">
+          <Field label="Width">
+            <NumberInput
+              value={s.width}
+              onChange={(n) => onChange({ width: n })}
+              step={0.5}
+              min={5}
+            />
+          </Field>
+          <Field label="Height">
+            <NumberInput
+              value={s.height}
+              onChange={(n) => onChange({ height: n })}
+              step={0.5}
+              min={5}
+            />
+          </Field>
+          <Field label="QR size">
+            <NumberInput
+              value={s.size}
+              onChange={(n) => onChange({ size: n })}
+              step={0.5}
+              min={5}
+            />
+          </Field>
+          <Field label="Corner radius">
+            <NumberInput
+              value={s.corner}
+              onChange={(n) => onChange({ corner: n })}
+              step={0.1}
+              min={0}
+            />
+          </Field>
+        </Section>
+        <Section title="Trapezoidal stem [mm]">
+          <Field label="Top width">
+            <NumberInput
+              value={s.stemTop}
+              onChange={(n) => onChange({ stemTop: n })}
+              step={0.5}
+              min={1}
+            />
+          </Field>
+          <Field label="Bottom width">
+            <NumberInput
+              value={s.stemBottom}
+              onChange={(n) => onChange({ stemBottom: n })}
+              step={0.5}
+              min={1}
+            />
+          </Field>
+          <Field label="Height">
+            <NumberInput
+              value={s.stemHeight}
+              onChange={(n) => onChange({ stemHeight: n })}
+              step={0.5}
+              min={1}
+            />
+          </Field>
+        </Section>
+      </>
+    );
+  },
 };
 
 const outlinePath = (
