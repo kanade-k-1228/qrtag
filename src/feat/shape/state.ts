@@ -20,8 +20,12 @@ const shapeStorage = (() => {
   };
 })();
 
-export const shapeAtom = atomWithStorage<ShapeProps>(
-  `qrtag:shape`,
-  SHAPE_DEFAULTS.square,
-  shapeStorage,
-);
+export const shapeAtom = atomWithStorage<ShapeProps>(`qrtag:shape`, {
+  shape: "square",
+  size: 28,
+  width: 40,
+  height: 40,
+  corner: 3,
+  tagHoleRadius: 2,
+  tagHoleOffset: 4,
+}, shapeStorage);
